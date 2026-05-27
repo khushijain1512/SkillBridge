@@ -1,7 +1,11 @@
 (function() {
 
     // ========== BACKEND API BASE URL ==========
+<<<<<<< HEAD
     const API_BASE = "https://skillbridge-backend-lehj.onrender.com";
+=======
+    const API_BASE = "https://skillbridge-backend-lehj.onrender.com/api";
+>>>>>>> e1db2a4 (Fix deployed API and dashboard issues)
     
     // ========== STORAGE KEYS ==========
     const STORAGE_USERS = "workhub_users_final";
@@ -717,7 +721,7 @@
         if (session && session.email === clientEmail) {
             renderClientDashboard(clientEmail);
         } else if (session && session.email === freelancerEmail) {
-            renderFreelancerDashboard(freelancerEmail);
+            renderContributorDashboard(freelancerEmail);
         }
     };
     
@@ -762,7 +766,7 @@
         if (session && session.email === clientEmail) {
             renderClientDashboard(clientEmail);
         } else if (session && session.email === freelancerEmail) {
-            renderFreelancerDashboard(freelancerEmail);
+            renderContributorDashboard(freelancerEmail);
         }
     };
 
@@ -891,7 +895,7 @@
         const existing = findUser(email);
         if (existing && existing.role === "freelancer") {
             setSession(email, "freelancer");
-            renderFreelancerDashboard(email);
+            renderContributorDashboard(email);
         } else if (existing && existing.role === "client") {
             alert("Email registered as project owner");
         } else {
@@ -947,7 +951,7 @@
         await createUser({ name, email, role: "contributor", phone, skills: category });
 
         setSession(email, "freelancer");
-        renderFreelancerDashboard(email);
+        renderContributorDashboard(email);
     };
 
     window.logout = function() {
@@ -1019,7 +1023,7 @@
             if (user && user.role === "client") {
                 renderClientDashboard(session.email);
             } else if (user && user.role === "freelancer") {
-                renderFreelancerDashboard(session.email);
+                renderContributorDashboard(session.email);
             } else {
                 renderLogin();
             }
@@ -1029,7 +1033,7 @@
     };
     
     window.goBackToContributor = function(email) {
-        renderFreelancerDashboard(email);
+        renderContributorDashboard(email);
     };
     
     window.submitWorkForProject = function(projectId, freelancerEmail, clientEmail) {
@@ -1073,7 +1077,7 @@
             
             const session = getSession();
             if (session && session.email === freelancerEmail) {
-                renderFreelancerDashboard(freelancerEmail);
+                renderContributorDashboard(freelancerEmail);
             }
         }
     };
@@ -1081,7 +1085,7 @@
     window.handleLeaveProject = function(projectId, freelancerEmail) {
         if (confirm("Are you sure you want to leave this project?")) {
             leaveProject(projectId, freelancerEmail);
-            renderFreelancerDashboard(freelancerEmail);
+            renderContributorDashboard(freelancerEmail);
         }
     };
     
@@ -1089,7 +1093,7 @@
         const success = await updateTaskStatus(taskId, newStatus, freelancerEmail);
         if (success) {
             alert(`Task marked as ${newStatus}!`);
-            renderFreelancerDashboard(freelancerEmail);
+            renderContributorDashboard(freelancerEmail);
         }
     };
     
@@ -1133,7 +1137,7 @@
     };
     
     window.cancelEditProfile = function(email) {
-        renderFreelancerDashboard(email);
+        renderContributorDashboard(email);
     };
     
     window.saveProfileEdit = async function(email) {
@@ -1156,7 +1160,7 @@
         
         if (await updateFreelancerProfile(email, updates)) {
             alert("Profile updated successfully!");
-            renderFreelancerDashboard(email);
+            renderContributorDashboard(email);
         }
     };
 
@@ -1189,7 +1193,7 @@
             alert("Invitation rejected.");
         }
         
-        renderFreelancerDashboard(freelancerEmail);
+        renderContributorDashboard(freelancerEmail);
     };
 
     // [Keep renderClientDashboard function - unchanged but ensure it uses async where needed]
@@ -1208,7 +1212,7 @@
             if (user && user.role === "client") {
                 renderClientDashboard(session.email);
             } else if (user && user.role === "freelancer") {
-                renderFreelancerDashboard(session.email);
+                renderContributorDashboard(session.email);
             } else {
                 renderLogin();
             }
