@@ -13,22 +13,6 @@ const API_BASE = "https://skillbridge-backend-lehj.onrender.com/api";
     const STORAGE_TASKS = "workhub_tasks_final";
     const STORAGE_CERTIFICATES = "workhub_certificates_final";
 
-        // ========== DASHBOARD ALIAS FUNCTIONS ==========
-    // Forward declaration to prevent "renderContributorDashboard is not defined" error
-    function renderContributorDashboard(email) {
-        if (typeof renderFreelancerDashboard === 'function') {
-            renderFreelancerDashboard(email);
-        } else {
-            console.warn('renderFreelancerDashboard not yet defined, will retry');
-            // Retry after a short delay
-            setTimeout(() => {
-                if (typeof renderFreelancerDashboard === 'function') {
-                    renderFreelancerDashboard(email);
-                }
-            }, 100);
-        }
-    }
-    
     // ========== API FUNCTIONS ==========
     async function apiFetch(endpoint, options = {}) {
         try {
@@ -945,14 +929,14 @@ const API_BASE = "https://skillbridge-backend-lehj.onrender.com/api";
         }
 
         const users = getUsers();
-        const newUser = {
+    const newUser = {
             email,
             name,
             category,
             phone,
             image,
             pastExperience: experience,
-            role: "contributor",
+            role: "freelancer",
             registered: true
         };
         
@@ -1215,7 +1199,15 @@ const API_BASE = "https://skillbridge-backend-lehj.onrender.com/api";
     // Note: renderClientDashboard and renderFreelancerDashboard are kept exactly as in original
     // They already call getProjects(), getTasks(), etc. which now fetch from synced localStorage
 function renderContributorDashboard(email) {
-    renderFreelancerDashboard(email);
+    // NOTE: If renderFreelancerDashboard exists in a separate file loaded before this one,
+    // restore this body to: renderFreelancerDashboard(email);
+    // Otherwise, the dashboard render logic must live here directly.
+    if (typeof renderFreelancerDashboard === 'function') {
+        renderFreelancerDashboard(email);
+    } else {
+        console.error('renderFreelancerDashboard is not defined. Ensure it is declared in scope before this IIFE runs.');
+        document.getElementById('app').innerHTML = '<div class="glass-card"><p>Dashboard failed to load. Please refresh or contact support.</p><button onclick="window.logout()" class="btn btn-outline">Logout</button></div>';
+    }
 }
     // ========== START APP ==========
     (async function() {
