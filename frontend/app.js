@@ -103,6 +103,25 @@
         });
     }
 
+    // Invitation API functions
+    async function getInvitationsFromAPI() {
+        return await apiFetch('/invitations');
+    }
+    
+    async function createInvitationAPI(invitationData) {
+        return await apiFetch('/invitations', {
+            method: 'POST',
+            body: JSON.stringify(invitationData)
+        });
+    }
+    
+    async function updateInvitationStatusAPI(invitationId, status) {
+        return await apiFetch(`/invitations/${invitationId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ status })
+        });
+    }
+
     // ========== INITIALIZE STORAGE ==========
     async function initializeStorage() {
         // Load users from backend if not in localStorage
@@ -140,7 +159,14 @@
             localStorage.setItem(STORAGE_TASKS, JSON.stringify([]));
         }
         
-        if (!localStorage.getItem(STORAGE_INVITATIONS)) localStorage.setItem(STORAGE_INVITATIONS, JSON.stringify([]));
+        // Load invitations from backend
+        const backendInvitations = await getInvitationsFromAPI();
+        if (backendInvitations && backendInvitations.length > 0) {
+            localStorage.setItem(STORAGE_INVITATIONS, JSON.stringify(backendInvitations));
+        } else if (!localStorage.getItem(STORAGE_INVITATIONS)) {
+            localStorage.setItem(STORAGE_INVITATIONS, JSON.stringify([]));
+        }
+        
         if (!localStorage.getItem(STORAGE_PROJECT_MEMBERS)) localStorage.setItem(STORAGE_PROJECT_MEMBERS, JSON.stringify([]));
         if (!localStorage.getItem(STORAGE_SUBMISSIONS)) localStorage.setItem(STORAGE_SUBMISSIONS, JSON.stringify([]));
         if (!localStorage.getItem(STORAGE_CERTIFICATES)) localStorage.setItem(STORAGE_CERTIFICATES, JSON.stringify([]));
@@ -1363,7 +1389,7 @@
         }
     };
 
-    window.respondToInvitation = function(invitationId, response, freelancerEmail, projectId) {
+    window.respondToInvitation = async function(invitationId, response, freelancerEmail, projectId) {
         let invitations = getInvitations();
         const invitationIndex = invitations.findIndex(i => i.id === invitationId);
         
@@ -1375,6 +1401,9 @@
         if (response === 'accept') {
             invitations[invitationIndex].status = 'accepted';
             saveInvitations(invitations);
+            
+            // Update backend invitation status
+            await updateInvitationStatusAPI(invitationId, 'accepted');
             
             addMemberToProject(projectId, freelancerEmail);
             
@@ -1389,6 +1418,7 @@
         } else {
             invitations[invitationIndex].status = 'rejected';
             saveInvitations(invitations);
+            await updateInvitationStatusAPI(invitationId, 'rejected');
             alert("Invitation rejected.");
         }
         
@@ -1436,7 +1466,7 @@
         `;
     };
 
-    window.sendInvitation = function(projectId, freelancerEmail) {
+    window.sendInvitation = async function(projectId, freelancerEmail) {
         const session = getSession();
         if (!session) return;
         
@@ -1448,16 +1478,21 @@
             return;
         }
         
-        invitations.push({
+        const newInvitation = {
             id: "inv_" + Date.now(),
             projectId: projectId,
             clientEmail: session.email,
             freelancerEmail: freelancerEmail,
             status: "pending",
             sentAt: Date.now()
-        });
+        };
         
+        invitations.push(newInvitation);
         saveInvitations(invitations);
+        
+        // Save to backend
+        await createInvitationAPI(newInvitation);
+        
         alert("Invitation sent successfully!");
         renderClientDashboard(session.email);
     };
