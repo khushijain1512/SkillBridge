@@ -14,12 +14,11 @@ app.use(cors());
 app.use(express.json());
 
 // Import routes
-// Import routes
 const userRoutes = require('./routes/userRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const invitationRoutes = require('./routes/invitationRoutes');
-// Use routes
+
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
