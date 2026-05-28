@@ -593,12 +593,12 @@
     // ========== CONTRIBUTOR PROFILE FUNCTIONS ==========
     function getFreelancerProfile(email) {
         const users = getUsers();
-        return users.find(u => u.email === email && u.role === "freelancer");
+        return users.find(u => u.email === email && u.role === "contributor");
     }
     
     async function updateFreelancerProfile(email, updates) {
         let users = getUsers();
-        const userIndex = users.findIndex(u => u.email === email && u.role === "freelancer");
+        const userIndex = users.findIndex(u => u.email === email && u.role === "contributor");
         
         if (userIndex === -1) {
             alert("Contributor not found!");
@@ -1076,8 +1076,8 @@
         }
         
         const existing = findUser(email);
-        if (existing && existing.role === "freelancer") {
-            setSession(email, "freelancer");
+        if (existing && existing.role === "contributor") {
+            setSession(email, "contributor");
             renderContributorDashboard(email);
         } else if (existing && existing.role === "project-owner") {
         alert("Email registered as project owner");
@@ -1123,7 +1123,7 @@
             phone,
             image,
             pastExperience: experience,
-            role: "freelancer",
+            role: "contributor",
             registered: true
         };
         
@@ -1134,12 +1134,12 @@
         await createUser({
     name,
     email,
-    role: "freelancer",
+    role: "contributor",
     phone,
     skills: category
 });
 
-        setSession(email, "freelancer");
+        setSession(email, "contributor");
         renderContributorDashboard(email);
     };
 
@@ -1211,7 +1211,7 @@
             const user = findUser(session.email);
             if (user && user.role === "project-owner") {
             renderClientDashboard(session.email);
-            } else if (user && user.role === "freelancer") {
+            } else if (user && user.role === "contributor") {
                 renderContributorDashboard(session.email);
             } else {
                 renderLogin();
@@ -1386,7 +1386,7 @@
     };
 
     window.showFreelancersForHire = function(projectId, projectName) {
-        const freelancers = getUsers().filter(u => u.role === "freelancer");
+        const freelancers = getUsers().filter(u => u.role === "contributor" );
         const currentMembers = getProjectMembersByProject(projectId);
         const availableFreelancers = freelancers.filter(f => !currentMembers.some(m => m.freelancerEmail === f.email));
         
@@ -1698,7 +1698,7 @@
             const user = findUser(session.email);
             if (user && user.role === "project-owner") {
     renderClientDashboard(session.email);
-} else if (user && user.role === "freelancer") {
+} else if (user && user.role === "contributor") {
     renderContributorDashboard(session.email);
 } else {
                 renderLogin();
